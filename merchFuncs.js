@@ -1,6 +1,8 @@
 var avgIslandDist = 0.000500;
 var renderDist = 0.002000;
 var mapQuantum = avgIslandDist;
+var latSeed = 4829;
+var lngSeed = 8513;
 
 var map;
 var center;
@@ -20,14 +22,14 @@ function initialize() {
 
 function createIslands(latLng)
 {
-	var cx = latLng.lng() + latLng.lng() % realDistance(mapQuantum,latLng);
+	var cx = latLng.lng() + latLng.lng() % realDistance(mapQuantum,latLng.lat());
 	var cy = latLng.lat() + latLng.lat() % mapQuantum;
 	var maxIslandsPerAxis = renderDist / avgIslandDist;
 	for(var i = -maxIslandsPerAxis; i < maxIslandsPerAxis; i++)
 	{
 		for(var j = -maxIslandsPerAxis; j < maxIslandsPerAxis; j++)
 		{
-			var coords = new google.maps.LatLng(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng) * i);
+			var coords = new randomizeIslandPosition(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
 			islands.push({marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",
@@ -39,9 +41,42 @@ function createIslands(latLng)
 	}
 }
 
-function realDistance(dist,latLng)
+function randomizeIslandPosition(lat, lng)
 {
-	var newDist = dist / Math.cos(Math.PI * latLng.lat() / 180);
-	console.log("latitude:" + latLng.lat() + " dist:" + dist + " newDist:" + newDist);
+	var latByQuant = lat / mapQuantum;
+	var lngByQuant = lng / mapQuantum;
+	
+	var iter = latByQuant - Math.floor(latByQuant/10) * 10 + lngByQuant - Math.floor(lngByQuant/10) * 10
+
+	var latRand = myRand(latSeed, iter);
+	var lngRand = myRand(lngSeed, iter);
+	
+	var newLat = lat + avgIslandDist * 0.6 * lngRand;
+	var newLng = lng + realDistance(avgIslandDist, lat) * 0.6 * latRand;
+
+	return new google.maps.LatLng(newLat, newLng);
+}
+
+function myRand(seed, iter)
+{
+	console.log(iter);
+	
+	if(iter == undefined)
+	{
+		iter = 1;
+	}
+	for(var i = 0; i < iter; i++)
+	{
+		seed = Math.floor((((Math.floor((seed * seed)/100))/10000) % 1) *10000);
+		console.log("seed" + seed);
+	}
+	
+	return seed / 10000;
+}
+
+function realDistance(dist,lat)
+{
+	var newDist = dist / Math.cos(Math.PI * lat / 180);
+	//console.log("latitude:" + latLng.lat() + " dist:" + dist + " newDist:" + newDist);
 	return newDist
 }
