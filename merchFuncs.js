@@ -1,5 +1,6 @@
 var avgIslandDist = 0.000500;
 var renderDist = 0.002000;
+var comRenderDist = 0.007000;
 var mapQuantum = avgIslandDist;
 var latSeed = 4829;
 var lngSeed = 8513;
@@ -7,6 +8,8 @@ var lngSeed = 8513;
 var map;
 var center;
 var islands = [];
+var comodities = [];
+
 function initialize() {
 	center = new google.maps.LatLng(59.323718,18.071131);
 	//center = new google.maps.LatLng(0.045000,18.270000);
@@ -17,7 +20,43 @@ function initialize() {
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 	
-	createIslands(center);
+	//createIslands(center);
+	createComodities(center);
+}
+
+function createComodities(latLng)
+{
+	var cx = latLng.lng() + latLng.lng() % realDistance(mapQuantum,latLng.lat());
+	var cy = latLng.lat() + latLng.lat() % mapQuantum;
+	var maxComoditiesPerAxis = comRenderDist / avgIslandDist;
+	for(var i = -maxComoditiesPerAxis; i < maxComoditiesPerAxis; i++)
+	{
+		for(var j = -maxComoditiesPerAxis; j < maxComoditiesPerAxis; j++)
+		{
+			var coordsSW = new google.maps.LatLng(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
+			var coordsNE = new google.maps.LatLng(coordsSW.lat() + avgIslandDist, coordsSW.lng() + realDistance(avgIslandDist,latLng.lat()));
+			var value = getComodityIcon(coordsSW);
+			comodities.push(new google.maps.Rectangle({
+											bounds: new google.maps.LatLngBounds(coordsSW, coordsNE),
+											strokeWeight: 0,
+											fillColor: "#00FF00",
+											fillOpacity: value,
+											map: map
+										})
+						);
+		}
+	}
+}
+
+function getComodityIcon(latLng)
+{
+	x = (latLng.lng()/avgIslandDist) * Math.cos(Math.PI * latLng.lat() / 180);
+	y = latLng.lat()/avgIslandDist;
+
+	var value = Math.sin(y*0.3)*Math.sin(x*0.3);
+	value = value + Math.sin(y*0.7)*Math.sin(x*0.7)*0.5;
+	
+	return (value + 1.5)/3;
 }
 
 function createIslands(latLng)
@@ -29,7 +68,7 @@ function createIslands(latLng)
 	{
 		for(var j = -maxIslandsPerAxis; j < maxIslandsPerAxis; j++)
 		{
-			var coords = new randomizeIslandPosition(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
+			var coords = randomizeIslandPosition(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
 			islands.push({marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",
