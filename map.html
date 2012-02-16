@@ -14,6 +14,22 @@
 		</script>
 	</head>
 	<body onload="initialize()">
-		<div id="map_canvas" style="width:800px; height:800px"></div>
+		<div id="map_canvas" style="float:left; width:800px; height:800px"></div>
+		<div id="Controls" style="float:left; width:1000px; height:800px;">
+			<div id="ControlsRow1" style="float:left; width:100%; height:50%;">
+				<div id="RenderControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+					Rendering controls<br>
+					Center:<br>
+					Lat:<input type="text" id="renderCenterLat" style="width:100px;"/><br>
+					Lng:<input type="text" id="renderCenterLng" style="width:100px;"/><br>
+					<br>
+					Distance:<input type="text" id="renderDistance" style="width:100px;"/><br>
+					<input type="button" value="Redraw" onclick="updateRenderingValues()"/><br>
+				</div>
+				<div id="ComodityControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+					comodity controls
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
