@@ -18,9 +18,12 @@ function initialize() {
 					mapTypeId: google.maps.MapTypeId.ROADMAP
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-	
-	createIslands(center);
-	createComodities(center);
+	google.maps.event.addListener(map, 'click', function(event) {
+    	e("renderCenterLat").value = event.latLng.lat();
+		e("renderCenterLng").value = event.latLng.lng();
+		updateRenderingValues();
+  	});
+	redraw();
 	updateInterface();
 }
 
@@ -33,17 +36,29 @@ function updateInterface()
 
 function redraw()
 {
-	
+	for (i in islands) {
+      islands[i].marker.setMap(null);
+    }
+	islands.length = 0;
+
+	for (i in comodities) {
+      comodities[i].setMap(null);
+    }
+	comodities.length = 0;
+	createIslands(center);
+	createComodities(center);
 }
 
 function updateRenderingValues()
 {
-	center = new google.maps.LatLng(59.323718,18.071131);
+	center = new google.maps.LatLng(e("renderCenterLat").value,e("renderCenterLng").value);
+	renderDist = e("renderDistance").value;
+	redraw();
 }
 
 function createComodities(latLng)
 {
-	var cx = latLng.lng() + latLng.lng() % realDistance(mapQuantum,latLng.lat());
+	var cx = latLng.lng() + latLng.lng() % mapQuantum;
 	var cy = latLng.lat() + latLng.lat() % mapQuantum;
 	var maxComoditiesPerAxis = renderDist / avgIslandDist;
 	for(var i = -maxComoditiesPerAxis; i < maxComoditiesPerAxis; i++)
@@ -83,8 +98,9 @@ function getComodityIcon(latLng)
 
 function createIslands(latLng)
 {
-	var cx = latLng.lng() + latLng.lng() % realDistance(mapQuantum,latLng.lat());
-	var cy = latLng.lat() + latLng.lat() % mapQuantum;
+	var cx = latLng.lng() - latLng.lng() % mapQuantum;
+	var cy = latLng.lat() - latLng.lat() % mapQuantum;
+	console.log("cx: " + cx + " cy: " + cy);
 	var maxIslandsPerAxis = renderDist / avgIslandDist;
 	for(var i = -maxIslandsPerAxis; i < maxIslandsPerAxis; i++)
 	{
