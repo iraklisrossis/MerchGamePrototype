@@ -46,7 +46,7 @@ function redraw()
     }
 	comodities.length = 0;
 	createIslands(center);
-	createComodities(center);
+	//createComodities(center);
 }
 
 function updateRenderingValues()
@@ -98,15 +98,20 @@ function getComodityIcon(latLng)
 
 function createIslands(latLng)
 {
-	var cx = latLng.lng() - latLng.lng() % mapQuantum;
-	var cy = latLng.lat() - latLng.lat() % mapQuantum;
-	console.log("cx: " + cx + " cy: " + cy);
+	//console.log("cx: " + cx + " cy: " + cy);
 	var maxIslandsPerAxis = renderDist / avgIslandDist;
-	for(var i = -maxIslandsPerAxis; i < maxIslandsPerAxis; i++)
+	for(var j = -maxIslandsPerAxis; j < maxIslandsPerAxis; j++)
 	{
-		for(var j = -maxIslandsPerAxis; j < maxIslandsPerAxis; j++)
+		var adjY = latLng.lat() + avgIslandDist * j;
+		var cy = adjY - adjY % mapQuantum;
+		var realXIslandDist = realDistance(avgIslandDist, cy);
+		var realXQuantum = realDistance(mapQuantum, cy);
+		for(var i = -maxIslandsPerAxis; i < maxIslandsPerAxis; i++)
 		{
-			var coords = randomizeIslandPosition(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
+			var adjX = latLng.lng() + realXIslandDist * i;
+			var cx = adjX - adjX % realXQuantum;
+			var coords = randomizeIslandPosition(cy, cx, mapQuantum, realXQuantum, avgIslandDist, realXIslandDist);
+			//var coords = new google.maps.LatLng(cy, cx);
 			islands.push({marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",
@@ -118,18 +123,18 @@ function createIslands(latLng)
 	}
 }
 
-function randomizeIslandPosition(lat, lng)
+function randomizeIslandPosition(lat, lng, yQuantum, xQuantum, yAvgDist, xAvgDist)
 {
-	var latByQuant = lat / mapQuantum;
-	var lngByQuant = lng / mapQuantum;
+	var latByQuant = lat / yQuantum;
+	var lngByQuant = lng / xQuantum;
 	
-	var iter = latByQuant - Math.floor(latByQuant/10) * 10 + lngByQuant - Math.floor(lngByQuant/10) * 10
+	var iter = ((((latByQuant - Math.floor(latByQuant/100) * 100) + 1)  * ((lngByQuant - Math.floor(lngByQuant/10) * 10) + 1)) % 15) + 1
 
 	var latRand = myRand(latSeed, iter);
 	var lngRand = myRand(lngSeed, iter);
 	
-	var newLat = lat + avgIslandDist * 0.6 * lngRand;
-	var newLng = lng + realDistance(avgIslandDist, lat) * 0.6 * latRand;
+	var newLat = lat + yAvgDist * 0.6 * lngRand;
+	var newLng = lng + xAvgDist * 0.6 * latRand;
 
 	return new google.maps.LatLng(newLat, newLng);
 }
