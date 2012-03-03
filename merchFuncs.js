@@ -1,8 +1,10 @@
 var avgIslandDist = 0.000500;
-var renderDist = 0.007000;
+var renderDist = 0.009000;
 var mapQuantum = avgIslandDist;
 var latSeed = 4829;
 var lngSeed = 8513;
+
+var comFreq = 0.05;
 
 var map;
 var center;
@@ -10,8 +12,8 @@ var islands = [];
 var comodities = [];
 
 function initialize() {
-	center = new google.maps.LatLng(59.323718,18.071131);
-	//center = new google.maps.LatLng(0.045000,18.270000);
+	//center = new google.maps.LatLng(59.323718,18.071131);
+	center = new google.maps.LatLng(0.045000,18.270000);
 	var myOptions = {
 					center: center,
 					zoom: 15,
@@ -45,8 +47,8 @@ function redraw()
       comodities[i].setMap(null);
     }
 	comodities.length = 0;
-	createIslands(center);
-	//createComodities(center);
+	//createIslands(center);
+	createComodities(center);
 }
 
 function updateRenderingValues()
@@ -58,16 +60,20 @@ function updateRenderingValues()
 
 function createComodities(latLng)
 {
-	var cx = latLng.lng() + latLng.lng() % mapQuantum;
-	var cy = latLng.lat() + latLng.lat() % mapQuantum;
 	var maxComoditiesPerAxis = renderDist / avgIslandDist;
-	for(var i = -maxComoditiesPerAxis; i < maxComoditiesPerAxis; i++)
+	for(var j = -maxComoditiesPerAxis; j < maxComoditiesPerAxis; j++)
 	{
-		for(var j = -maxComoditiesPerAxis; j < maxComoditiesPerAxis; j++)
+		var adjY = latLng.lat() + avgIslandDist * j;
+		var cy = adjY - adjY % mapQuantum;
+		var realXIslandDist = realDistance(avgIslandDist, cy);
+		var realXQuantum = realDistance(mapQuantum, cy);
+		for(var i = -maxComoditiesPerAxis; i < maxComoditiesPerAxis; i++)
 		{
-			var coordsSW = new google.maps.LatLng(cy + avgIslandDist * j, cx + realDistance(avgIslandDist,latLng.lat()) * i);
-			var coordsNE = new google.maps.LatLng(coordsSW.lat() + avgIslandDist, coordsSW.lng() + realDistance(avgIslandDist,latLng.lat()));
-			var value = getComodityIcon(coordsSW);
+			var adjX = latLng.lng() + realXIslandDist * i;
+			var cx = adjX - adjX % realXQuantum;
+			var coordsSW = new google.maps.LatLng(cy, cx);
+			var coordsNE = new google.maps.LatLng(coordsSW.lat() + avgIslandDist, coordsSW.lng() + realXIslandDist);
+			var value = getComodityValue(coordsSW);
 			comodities.push(new google.maps.Rectangle({
 											bounds: new google.maps.LatLngBounds(coordsSW, coordsNE),
 											strokeWeight: 0,
@@ -85,15 +91,19 @@ function e(elementName)
 	return document.getElementById(elementName);
 }
 
-function getComodityIcon(latLng)
+function getComodityValue(latLng)
 {
-	x = (latLng.lng()/avgIslandDist) * Math.cos(Math.PI * latLng.lat() / 180);
 	y = latLng.lat()/avgIslandDist;
 
-	var value = Math.sin(y*0.3)*Math.sin(x*0.3);
-	value = value + Math.sin(y*0.7)*Math.sin(x*0.7)*0.5;
+	cLat = (y - y % (2*Math.PI)) * avgIslandDist;
 	
-	return (value + 1.5)/3;
+	x = latLng.lng()/realDistance(avgIslandDist, cLat);
+
+	var value = (Math.sin(y*comFreq*2*Math.PI) + Math.sin(x*comFreq*2*Math.PI))/2;
+	//value = value + Math.sin(y*0.7)*Math.sin(x*0.7)*0.5;
+	
+	return (value + 1)/2;
+	//return (value + 1.5)/3;
 }
 
 function createIslands(latLng)
@@ -110,8 +120,8 @@ function createIslands(latLng)
 		{
 			var adjX = latLng.lng() + realXIslandDist * i;
 			var cx = adjX - adjX % realXQuantum;
-			var coords = randomizeIslandPosition(cy, cx, mapQuantum, realXQuantum, avgIslandDist, realXIslandDist);
-			//var coords = new google.maps.LatLng(cy, cx);
+			//var coords = randomizeIslandPosition(cy, cx, mapQuantum, realXQuantum, avgIslandDist, realXIslandDist);
+			var coords = new google.maps.LatLng(cy, cx);
 			islands.push({marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",
