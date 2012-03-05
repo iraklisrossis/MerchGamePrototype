@@ -12,8 +12,8 @@ var islands = [];
 var comodities = [];
 
 function initialize() {
-	//center = new google.maps.LatLng(59.323718,18.071131);
-	center = new google.maps.LatLng(0.045000,18.270000);
+	center = new google.maps.LatLng(59.323718,18.071131);
+	//center = new google.maps.LatLng(0.000000,18.270000);
 	var myOptions = {
 					center: center,
 					zoom: 15,
@@ -58,8 +58,15 @@ function updateRenderingValues()
 	redraw();
 }
 
+var filterLines = [];
+
 function createComodities(latLng)
 {
+	for (i in filterLines) {
+      filterLines[i].setMap(null);
+    }
+	filterLines.length = 0;
+	
 	var maxComoditiesPerAxis = renderDist / avgIslandDist;
 	for(var j = -maxComoditiesPerAxis; j < maxComoditiesPerAxis; j++)
 	{
@@ -95,11 +102,23 @@ function getComodityValue(latLng)
 {
 	y = latLng.lat()/avgIslandDist;
 
-	cLat = (y - y % (2*Math.PI)) * avgIslandDist;
+	cLat = (y - y % (1/comFreq)) * avgIslandDist;
 	
 	x = latLng.lng()/realDistance(avgIslandDist, cLat);
 
-	var value = (Math.sin(y*comFreq*2*Math.PI) + Math.sin(x*comFreq*2*Math.PI))/2;
+	var polyPoints = [
+						new google.maps.LatLng(cLat, latLng.lng()),
+						new google.maps.LatLng(cLat, latLng.lng() + realDistance(avgIslandDist, cLat))
+					];
+	filterLines.push(new google.maps.Polyline({
+										path: polyPoints,
+										strokeColor: "#FF0000",
+										strokeOpacity: 1.0,
+										strokeWeight: 2,
+										map: map
+								})
+					);
+	var value = (Math.cos(y*comFreq*2*Math.PI + Math.PI) + Math.cos(x*comFreq*2*Math.PI + Math.PI))/2;
 	//value = value + Math.sin(y*0.7)*Math.sin(x*0.7)*0.5;
 	
 	return (value + 1)/2;
