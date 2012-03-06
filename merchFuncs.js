@@ -1,18 +1,25 @@
 var avgIslandDist = 0.000500;
 var renderDist = 0.009000;
-var mapQuantum = avgIslandDist;
 var latSeed = 4829;
 var lngSeed = 8513;
 
-var comFreq = 0.05;
+var shouldDrawIslands = true;
+var shouldDrawComodity = false;
+
+//var comFreqs = [0.006];
+var comFreqs = [0.006, 0.017, 0.027];
+var comColor = "00FF00";
+var comAtten = 0.5;
 
 var map;
+var cLat = 59.323718;
+var cLng = 18.071131;
 var center;
 var islands = [];
 var comodities = [];
 
 function initialize() {
-	center = new google.maps.LatLng(59.323718,18.071131);
+	center = new google.maps.LatLng(cLat,cLng);
 	//center = new google.maps.LatLng(0.000000,18.270000);
 	var myOptions = {
 					center: center,
@@ -21,40 +28,42 @@ function initialize() {
 	};
 	map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 	google.maps.event.addListener(map, 'click', function(event) {
-    	e("renderCenterLat").value = event.latLng.lat();
-		e("renderCenterLng").value = event.latLng.lng();
+    	cLat = e("renderCenterLat").value = event.latLng.lat();
+		cLng = e("renderCenterLng").value = event.latLng.lng();
 		updateRenderingValues();
   	});
+  	updateInterface();
 	redraw();
-	updateInterface();
 }
 
 function updateInterface()
 {
-	e("renderCenterLat").value = center.lat();
-	e("renderCenterLng").value = center.lng();
+	e("renderCenterLat").value = cLat;
+	e("renderCenterLng").value = cLng;
 	e("renderDistance").value = renderDist;
+
+	e("renderIslandsCheckbox").checked = shouldDrawIslands;
+	e("avgIslandDistBox").value = avgIslandDist;
+	e("latSeedBox").value = latSeed;
+	e("lngSeedBox").value = lngSeed;
+
+	e("renderComodityCheckbox").checked = shouldDrawComodity;
+	e("comColorBox").value = comColor;
+	e("comFreq1Box").value = comFreqs[0];
+	e("comFreq2Box").value = comFreqs[1];
+	e("comFreq3Box").value = comFreqs[2];
+	e("comAttenBox").value = comAtten;
 }
 
 function redraw()
 {
-	for (i in islands) {
-      islands[i].marker.setMap(null);
-    }
-	islands.length = 0;
-
-	for (i in comodities) {
-      comodities[i].setMap(null);
-    }
-	comodities.length = 0;
-	//createIslands(center);
+	createIslands(center);
 	createComodities(center);
 }
 
 function updateRenderingValues()
 {
-	center = new google.maps.LatLng(e("renderCenterLat").value,e("renderCenterLng").value);
-	renderDist = e("renderDistance").value;
+	center = new google.maps.LatLng(cLat,cLng);
 	redraw();
 }
 
@@ -62,18 +71,24 @@ var filterLines = [];
 
 function createComodities(latLng)
 {
-	for (i in filterLines) {
-      filterLines[i].setMap(null);
+	
+	for (i in comodities) {
+      comodities[i].setMap(null);
     }
-	filterLines.length = 0;
+	comodities.length = 0;
+	
+	if(!shouldDrawComodity)
+	{
+		return;
+	}
 	
 	var maxComoditiesPerAxis = renderDist / avgIslandDist;
 	for(var j = -maxComoditiesPerAxis; j < maxComoditiesPerAxis; j++)
 	{
 		var adjY = latLng.lat() + avgIslandDist * j;
-		var cy = adjY - adjY % mapQuantum;
+		var cy = adjY - adjY % avgIslandDist;
 		var realXIslandDist = realDistance(avgIslandDist, cy);
-		var realXQuantum = realDistance(mapQuantum, cy);
+		var realXQuantum = realDistance(avgIslandDist, cy);
 		for(var i = -maxComoditiesPerAxis; i < maxComoditiesPerAxis; i++)
 		{
 			var adjX = latLng.lng() + realXIslandDist * i;
@@ -81,11 +96,15 @@ function createComodities(latLng)
 			var coordsSW = new google.maps.LatLng(cy, cx);
 			var coordsNE = new google.maps.LatLng(coordsSW.lat() + avgIslandDist, coordsSW.lng() + realXIslandDist);
 			var value = getComodityValue(coordsSW);
+			//var green = Math.floor(255*value);
+			//var red = 255 - green;
 			comodities.push(new google.maps.Rectangle({
 											bounds: new google.maps.LatLngBounds(coordsSW, coordsNE),
 											strokeWeight: 0,
-											fillColor: "#00FF00",
+											fillColor: "#" + comColor,
 											fillOpacity: value,
+											//fillColor: "#" + red.toString(16) + green.toString(16) + "00",
+											//fillOpacity: 0.5,
 											map: map
 										})
 						);
@@ -100,13 +119,26 @@ function e(elementName)
 
 function getComodityValue(latLng)
 {
+	var valueSum = 0;
+	var weightSum = 0;
+	var weight = 1;
+	for(var i = 0; i < comFreqs.length; i++) {
+    	valueSum += getWaveValue(comFreqs[i], latLng) * weight;
+    	weightSum += weight;
+    	weight *= comAtten;
+    }
+    return valueSum/weightSum;
+}
+
+function getWaveValue(freq, latLng)
+{
 	y = latLng.lat()/avgIslandDist;
 
-	cLat = (y - y % (1/comFreq)) * avgIslandDist;
+	cLat = (y - y % (1/freq)) * avgIslandDist;
 	
 	x = latLng.lng()/realDistance(avgIslandDist, cLat);
 
-	var polyPoints = [
+	/*var polyPoints = [
 						new google.maps.LatLng(cLat, latLng.lng()),
 						new google.maps.LatLng(cLat, latLng.lng() + realDistance(avgIslandDist, cLat))
 					];
@@ -117,30 +149,39 @@ function getComodityValue(latLng)
 										strokeWeight: 2,
 										map: map
 								})
-					);
-	var value = (Math.cos(y*comFreq*2*Math.PI + Math.PI) + Math.cos(x*comFreq*2*Math.PI + Math.PI))/2;
+					);*/
+	var value = (Math.cos(y*freq*2*Math.PI + Math.PI) + Math.cos(x*freq*2*Math.PI + Math.PI))/2;
 	//value = value + Math.sin(y*0.7)*Math.sin(x*0.7)*0.5;
-	
-	return (value + 1)/2;
-	//return (value + 1.5)/3;
+	//value = (value + 1)/2;
+	value = (value>0)?value:0;
+	return value;
 }
 
 function createIslands(latLng)
 {
+	for (i in islands) {
+      islands[i].marker.setMap(null);
+    }
+	islands.length = 0;
+	
+	if(!shouldDrawIslands)
+	{
+		return;
+	}
 	//console.log("cx: " + cx + " cy: " + cy);
 	var maxIslandsPerAxis = renderDist / avgIslandDist;
 	for(var j = -maxIslandsPerAxis; j < maxIslandsPerAxis; j++)
 	{
 		var adjY = latLng.lat() + avgIslandDist * j;
-		var cy = adjY - adjY % mapQuantum;
+		var cy = adjY - adjY % avgIslandDist;
 		var realXIslandDist = realDistance(avgIslandDist, cy);
-		var realXQuantum = realDistance(mapQuantum, cy);
+		var realXQuantum = realDistance(avgIslandDist, cy);
 		for(var i = -maxIslandsPerAxis; i < maxIslandsPerAxis; i++)
 		{
 			var adjX = latLng.lng() + realXIslandDist * i;
 			var cx = adjX - adjX % realXQuantum;
-			//var coords = randomizeIslandPosition(cy, cx, mapQuantum, realXQuantum, avgIslandDist, realXIslandDist);
-			var coords = new google.maps.LatLng(cy, cx);
+			var coords = randomizeIslandPosition(cy, cx, avgIslandDist, realXQuantum, avgIslandDist, realXIslandDist);
+			//var coords = new google.maps.LatLng(cy, cx);
 			islands.push({marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",

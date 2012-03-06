@@ -19,15 +19,31 @@
 			<div id="ControlsRow1" style="float:left; width:100%; height:50%;">
 				<div id="RenderControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
 					Rendering controls<br>
-					Center:<br>
-					Lat:<input type="text" id="renderCenterLat" style="width:100px;"/><br>
-					Lng:<input type="text" id="renderCenterLng" style="width:100px;"/><br>
 					<br>
-					Distance:<input type="text" id="renderDistance" style="width:100px;"/><br>
+					Center:<br>
+					Lat:<input type="text" id="renderCenterLat" style="width:100px;" onchange="cLat = this.value"/><br>
+					Lng:<input type="text" id="renderCenterLng" style="width:100px;" onchange="cLng = this.value"/><br>
+					<br>
+					Distance:<input type="text" id="renderDistance" style="width:100px;" onchange="renderDist = this.value"/><br>
 					<input type="button" value="Redraw" onclick="updateRenderingValues()"/><br>
 				</div>
+				<div id="IslandControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+					Island Controls<br>
+					<br>
+					Render <input id="renderIslandsCheckbox" type="checkbox" onclick="shouldDrawIslands=this.checked;createIslands(center);"/><br>
+					avgDist:<input type="text" id="avgIslandDistBox" style="width:100px;" onchange="avgIslandDist = this.value"/><br>
+					latSeed:<input type="text" id="latSeedBox" style="width:100px;" onchange="latSeed = this.value"/><br>
+					lngSeed:<input type="text" id="lngSeedBox" style="width:100px;" onchange="lngSeed = this.value"/><br>
+				</div>
 				<div id="ComodityControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
-					comodity controls
+					comodity controls<br>
+					<br>
+					Render <input id="renderComodityCheckbox" type="checkbox" onclick="shouldDrawComodity=this.checked;createComodities(center);"/><br>
+					Color:<input type="text" id="comColorBox" style="width:100px;" onchange="comColor = this.value"/><br>
+					Freq1:<input type="text" id="comFreq1Box" style="width:100px;" onchange="comFreqs[0] = this.value"/><br>
+					Freq2:<input type="text" id="comFreq2Box" style="width:100px;" onchange="comFreqs[1] = this.value"/><br>
+					Freq3:<input type="text" id="comFreq3Box" style="width:100px;" onchange="comFreqs[2] = this.value"/><br>
+					Attenuation:<input type="text" id="comAttenBox" style="width:100px;" onchange="comAtten = this.value"/><br>
 				</div>
 			</div>
 		</div>
