@@ -4,19 +4,22 @@ var latSeed = 4829;
 var lngSeed = 8513;
 
 var shouldDrawIslands = true;
-var shouldDrawComodity = false;
 
-//var comFreqs = [0.006];
-var comFreqs = [0.006, 0.017, 0.027];
-var comColor = "00FF00";
-var comAtten = 0.5;
+var commodities = {};
+
+commodities.wheat = {
+	freqs: [0.006, 0.017, 0.027],
+	color: "00FF00",
+	atten: 0.5,
+	draw: false,
+	icons: []
+}
 
 var map;
 var cLat = 59.323718;
 var cLng = 18.071131;
 var center;
 var islands = [];
-var comodities = [];
 
 function initialize() {
 	center = new google.maps.LatLng(cLat,cLng);
@@ -47,18 +50,18 @@ function updateInterface()
 	e("latSeedBox").value = latSeed;
 	e("lngSeedBox").value = lngSeed;
 
-	e("renderComodityCheckbox").checked = shouldDrawComodity;
-	e("comColorBox").value = comColor;
-	e("comFreq1Box").value = comFreqs[0];
-	e("comFreq2Box").value = comFreqs[1];
-	e("comFreq3Box").value = comFreqs[2];
-	e("comAttenBox").value = comAtten;
+	e("renderWheatCheckbox").checked = commodities.wheat.draw;
+	e("wheatColorBox").value = commodities.wheat.color;
+	e("wheatFreq1Box").value = commodities.wheat.freqs[0];
+	e("wheatFreq2Box").value = commodities.wheat.freqs[1];
+	e("wheatFreq3Box").value = commodities.wheat.freqs[2];
+	e("wheatAttenBox").value = commodities.wheat.atten;
 }
 
 function redraw()
 {
 	createIslands(center);
-	createComodities(center);
+	createCommodities(center, commodities.wheat);
 }
 
 function updateRenderingValues()
@@ -69,15 +72,15 @@ function updateRenderingValues()
 
 var filterLines = [];
 
-function createComodities(latLng)
+function createCommodities(latLng, commodity)
 {
 	
-	for (i in comodities) {
-      comodities[i].setMap(null);
+	for (i in commodity.icons) {
+      commodity.icons[i].setMap(null);
     }
-	comodities.length = 0;
+	commodity.icons.length = 0;
 	
-	if(!shouldDrawComodity)
+	if(!commodity.draw)
 	{
 		return;
 	}
@@ -95,13 +98,13 @@ function createComodities(latLng)
 			var cx = adjX - adjX % realXQuantum;
 			var coordsSW = new google.maps.LatLng(cy, cx);
 			var coordsNE = new google.maps.LatLng(coordsSW.lat() + avgIslandDist, coordsSW.lng() + realXIslandDist);
-			var value = getComodityValue(coordsSW);
+			var value = getCommodityValue(coordsSW, commodity);
 			//var green = Math.floor(255*value);
 			//var red = 255 - green;
-			comodities.push(new google.maps.Rectangle({
+			commodity.icons.push(new google.maps.Rectangle({
 											bounds: new google.maps.LatLngBounds(coordsSW, coordsNE),
 											strokeWeight: 0,
-											fillColor: "#" + comColor,
+											fillColor: "#" + commodity.color,
 											fillOpacity: value,
 											//fillColor: "#" + red.toString(16) + green.toString(16) + "00",
 											//fillOpacity: 0.5,
@@ -117,15 +120,15 @@ function e(elementName)
 	return document.getElementById(elementName);
 }
 
-function getComodityValue(latLng)
+function getCommodityValue(latLng, commodity)
 {
 	var valueSum = 0;
 	var weightSum = 0;
 	var weight = 1;
-	for(var i = 0; i < comFreqs.length; i++) {
-    	valueSum += getWaveValue(comFreqs[i], latLng) * weight;
+	for(var i = 0; i < commodity.freqs.length; i++) {
+    	valueSum += getWaveValue(commodity.freqs[i], latLng) * weight;
     	weightSum += weight;
-    	weight *= comAtten;
+    	weight *= commodity.atten;
     }
     return valueSum/weightSum;
 }

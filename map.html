@@ -16,8 +16,8 @@
 	<body onload="initialize()">
 		<div id="map_canvas" style="float:left; width:800px; height:800px"></div>
 		<div id="Controls" style="float:left; width:1000px; height:800px;">
-			<div id="ControlsRow1" style="align:top; width:100%; height:30%;">
-				<div id="RenderControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+			<div id="ControlsRow1" style="float:top; width:100%; height:30%;">
+				<div id="RenderControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
 					Rendering controls<br>
 					<br>
 					Center:<br>
@@ -27,7 +27,7 @@
 					Distance:<input type="text" id="renderDistance" style="width:100px;" onchange="renderDist = this.value"/><br>
 					<input type="button" value="Redraw" onclick="updateRenderingValues()"/><br>
 				</div>
-				<div id="IslandControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+				<div id="IslandControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
 					Island Controls<br>
 					<br>
 					Render <input id="renderIslandsCheckbox" type="checkbox" onclick="shouldDrawIslands=this.checked;createIslands(center);"/><br>
@@ -37,8 +37,18 @@
 				</div>
 				
 			</div>
-			<div id="ControlsRow2" style="align:bottom; width:100%; height:50%;">
-				<div id="ComodityControls" style="float:left; width:150px; height:100%; padding: 5px; border: 5px white groove;">
+			<div id="ControlsRow2" style="float:top; width:100%; height:50%;">
+				<div id="WheatControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
+					Wheat<br>
+					<br>
+					Render <input id="renderWheatCheckbox" type="checkbox" onclick="commodities.wheat.draw=this.checked;createCommodities(center, commodities.wheat);"/><br>
+					Color:<input type="text" id="wheatColorBox" style="width:100px;" onchange="commodities.wheat.color = this.value"/><br>
+					Freq1:<input type="text" id="wheatFreq1Box" style="width:100px;" onchange="commodities.wheat.freqs[0] = this.value"/><br>
+					Freq2:<input type="text" id="wheatFreq2Box" style="width:100px;" onchange="commodities.wheat.freqs[1] = this.value"/><br>
+					Freq3:<input type="text" id="wheatFreq3Box" style="width:100px;" onchange="commodities.wheat.freqs[2] = this.value"/><br>
+					Attenuation:<input type="text" id="wheatAttenBox" style="width:100px;" onchange="commodities.wheat.atten = this.value"/><br>
+				</div>
+				<div id="CommodityControls2" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
 					comodity controls<br>
 					<br>
 					Render <input id="renderComodityCheckbox" type="checkbox" onclick="shouldDrawComodity=this.checked;createComodities(center);"/><br>
