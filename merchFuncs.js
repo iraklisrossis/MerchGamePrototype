@@ -15,6 +15,11 @@ commodities.wheat = {
 	icons: []
 }
 
+var player = {
+	funds: 5000,
+	wheat: 0
+}
+
 var map;
 var cLat = 59.323718;
 var cLng = 18.071131;
@@ -49,6 +54,9 @@ function updateInterface()
 	e("avgIslandDistBox").value = avgIslandDist;
 	e("latSeedBox").value = latSeed;
 	e("lngSeedBox").value = lngSeed;
+	
+	e("playerFundsLabel").innerHTML = player.funds;
+	e("playerWheatLabel").innerHTML = player.wheat;
 
 	e("renderWheatCheckbox").checked = commodities.wheat.draw;
 	e("wheatColorBox").value = commodities.wheat.color;
