@@ -42,6 +42,8 @@
 					<br>
 					Cargo Hold<br>
 					Wheat: <label type="text" id="playerWheatLabel" style="width:100px;"/></label><br>
+					Apples: <label type="text" id="playerApplesLabel" style="width:100px;"/></label><br>
+					Gold: <label type="text" id="playerGoldLabel" style="width:100px;"/></label><br>
 				</div>
 			</div>
 			<div id="ControlsRow2" style="float:top; width:100%; height:50%;">
@@ -50,20 +52,36 @@
 					<br>
 					Render <input id="renderWheatCheckbox" type="checkbox" onclick="commodities.wheat.draw=this.checked;createCommodities(center, commodities.wheat);"/><br>
 					Color:<input type="text" id="wheatColorBox" style="width:100px;" onchange="commodities.wheat.color = this.value"/><br>
+					Floor :<input type="text" id="wheatFloorPBox" style="width:100px;" onchange="commodities.wheat.floorPrice = this.value"/><br>
+					Ceilin:<input type="text" id="wheatCeilPBox" style="width:100px;" onchange="commodities.wheat.ceilingPrice = this.value"/><br>
 					Freq1:<input type="text" id="wheatFreq1Box" style="width:100px;" onchange="commodities.wheat.freqs[0] = this.value"/><br>
 					Freq2:<input type="text" id="wheatFreq2Box" style="width:100px;" onchange="commodities.wheat.freqs[1] = this.value"/><br>
 					Freq3:<input type="text" id="wheatFreq3Box" style="width:100px;" onchange="commodities.wheat.freqs[2] = this.value"/><br>
 					Attenuation:<input type="text" id="wheatAttenBox" style="width:100px;" onchange="commodities.wheat.atten = this.value"/><br>
 				</div>
-				<div id="CommodityControls2" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
-					comodity controls<br>
+				<div id="ApplesControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
+					Apples<br>
 					<br>
-					Render <input id="renderComodityCheckbox" type="checkbox" onclick="shouldDrawComodity=this.checked;createComodities(center);"/><br>
-					Color:<input type="text" id="comColorBox" style="width:100px;" onchange="comColor = this.value"/><br>
-					Freq1:<input type="text" id="comFreq1Box" style="width:100px;" onchange="comFreqs[0] = this.value"/><br>
-					Freq2:<input type="text" id="comFreq2Box" style="width:100px;" onchange="comFreqs[1] = this.value"/><br>
-					Freq3:<input type="text" id="comFreq3Box" style="width:100px;" onchange="comFreqs[2] = this.value"/><br>
-					Attenuation:<input type="text" id="comAttenBox" style="width:100px;" onchange="comAtten = this.value"/><br>
+					Render <input id="renderApplesCheckbox" type="checkbox" onclick="commodities.apples.draw=this.checked;createCommodities(center, commodities.apples);"/><br>
+					Color:<input type="text" id="applesColorBox" style="width:100px;" onchange="commodities.apples.color = this.value"/><br>
+					Floor :<input type="text" id="applesFloorPBox" style="width:100px;" onchange="commodities.apples.floorPrice = this.value"/><br>
+					Ceilin:<input type="text" id="applesCeilPBox" style="width:100px;" onchange="commodities.apples.ceilingPrice = this.value"/><br>
+					Freq1:<input type="text" id="applesFreq1Box" style="width:100px;" onchange="commodities.apples.freqs[0] = this.value"/><br>
+					Freq2:<input type="text" id="applesFreq2Box" style="width:100px;" onchange="commodities.apples.freqs[1] = this.value"/><br>
+					Freq3:<input type="text" id="applesFreq3Box" style="width:100px;" onchange="commodities.apples.freqs[2] = this.value"/><br>
+					Attenuation:<input type="text" id="applesAttenBox" style="width:100px;" onchange="commodities.apples.atten = this.value"/><br>
+				</div>
+				<div id="GoldControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
+					Gold<br>
+					<br>
+					Render <input id="renderGoldCheckbox" type="checkbox" onclick="commodities.gold.draw=this.checked;createCommodities(center, commodities.gold);"/><br>
+					Color:<input type="text" id="goldColorBox" style="width:100px;" onchange="commodities.gold.color = this.value"/><br>
+					Floor :<input type="text" id="goldFloorPBox" style="width:100px;" onchange="commodities.gold.floorPrice = this.value"/><br>
+					Ceilin:<input type="text" id="goldCeilPBox" style="width:100px;" onchange="commodities.gold.ceilingPrice = this.value"/><br>
+					Freq1:<input type="text" id="goldFreq1Box" style="width:100px;" onchange="commodities.gold.freqs[0] = this.value"/><br>
+					Freq2:<input type="text" id="goldFreq2Box" style="width:100px;" onchange="commodities.gold.freqs[1] = this.value"/><br>
+					Freq3:<input type="text" id="goldFreq3Box" style="width:100px;" onchange="commodities.gold.freqs[2] = this.value"/><br>
+					Attenuation:<input type="text" id="goldAttenBox" style="width:100px;" onchange="commodities.gold.atten = this.value"/><br>
 				</div>
 			</div>
 		</div>
