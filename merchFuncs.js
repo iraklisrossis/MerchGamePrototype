@@ -8,10 +8,13 @@ var shouldDrawIslands = true;
 var commodities = {};
 
 commodities.wheat = {
+	name: "Wheat",
 	freqs: [0.006, 0.017, 0.027],
 	color: "00FF00",
 	atten: 0.5,
 	draw: false,
+	floorPrice: 10,
+	ceilingPrice: 100,
 	icons: []
 }
 
@@ -25,6 +28,7 @@ var cLat = 59.323718;
 var cLng = 18.071131;
 var center;
 var islands = [];
+var islandWindow;
 
 function initialize() {
 	center = new google.maps.LatLng(cLat,cLng);
@@ -40,6 +44,10 @@ function initialize() {
 		cLng = e("renderCenterLng").value = event.latLng.lng();
 		updateRenderingValues();
   	});
+  	
+  	islandWindow = new google.maps.InfoWindow({
+  												content: "Wheat: <label id='wheatPriceLabel'></label>$ <input type='button' value='Buy'/><input type='button' value='Sell'/>"
+  												});
   	updateInterface();
 	redraw();
 }
@@ -113,7 +121,7 @@ function createCommodities(latLng, commodity)
 											bounds: new google.maps.LatLngBounds(coordsSW, coordsNE),
 											strokeWeight: 0,
 											fillColor: "#" + commodity.color,
-											fillOpacity: value,
+											fillOpacity: (value - commodity.floorPrice)/(commodity.ceilingPrice - commodity.floorPrice),
 											//fillColor: "#" + red.toString(16) + green.toString(16) + "00",
 											//fillOpacity: 0.5,
 											map: map
@@ -138,7 +146,8 @@ function getCommodityValue(latLng, commodity)
     	weightSum += weight;
     	weight *= commodity.atten;
     }
-    return valueSum/weightSum;
+    var percent = valueSum/weightSum;
+    return commodity.floorPrice + (commodity.ceilingPrice - commodity.floorPrice) * percent;
 }
 
 function getWaveValue(freq, latLng)
@@ -193,15 +202,49 @@ function createIslands(latLng)
 			var cx = adjX - adjX % realXQuantum;
 			var coords = randomizeIslandPosition(cy, cx, avgIslandDist, realXQuantum, avgIslandDist, realXIslandDist);
 			//var coords = new google.maps.LatLng(cy, cx);
-			islands.push({marker:new google.maps.Marker({
+			var island={marker:new google.maps.Marker({
 											position: coords,
 											title:"Hello World!",
 											icon: "images/island.png",
-											map: map
+											map: map,
+											clickable:true
 										})
-						});
+						};
+			setInfoWindowToIsland(island);
+  			islands.push(island);
 		}
 	}
+}
+
+function setInfoWindowToIsland(island)
+{
+	google.maps.event.addListener(island.marker, 'click', function(event) {
+															showInfoWindow(island);
+  														});
+}
+
+function showInfoWindow(island)
+{
+	var windowContent = "";
+	for(commodityName in commodities)
+	{
+		var commodity = commodities[commodityName];
+		var price = getCommodityValue(island.marker.getPosition(), commodities.wheat);
+		windowContent += commodityName + ": " + Math.floor(price) + "$ <input type='button' value='Buy' onclick='buyCommodity(" + price + ",commodities." + commodityName + ")'/><input type='button' value='Sell' onclick='sellCommodity(" + price + ",commodities." + commodityName + ")'/><br>"
+	}
+
+	islandWindow.setContent(windowContent);
+  	islandWindow.open(map, island.marker);
+}
+
+function buyCommodity(price, commodity)
+{
+	alert("Buying " + commodity.name + " at " + price);
+}
+
+function sellCommodity(price, commodity)
+{
+	alert("Selling " + commodity.name + " at " + price);
 }
 
 function randomizeIslandPosition(lat, lng, yQuantum, xQuantum, yAvgDist, xAvgDist)
