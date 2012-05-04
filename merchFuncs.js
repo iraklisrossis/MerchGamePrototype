@@ -3,6 +3,8 @@ var renderDist = 0.009000;
 var latSeed = 4829;
 var lngSeed = 8513;
 
+var sellValue = 0.75;
+
 var shouldDrawIslands = true;
 
 var commodities = {};
@@ -282,8 +284,9 @@ function showInfoWindow(island)
 	for(commodityName in commodities)
 	{
 		var commodity = commodities[commodityName];
-		var price = Math.floor(getCommodityValue(island.marker.getPosition(), commodity));
-		windowContent += commodityName + ": " + price + "$ <input type='button' value='Buy' onclick='buyCommodity(" + price + ",commodities." + commodityName + ")'/><input type='button' value='Sell' onclick='sellCommodity(" + price + ",commodities." + commodityName + ")'/><br>"
+		var buyPrice = Math.floor(getCommodityValue(island.marker.getPosition(), commodity));
+		var sellPrice = Math.floor(buyPrice * sellValue);
+		windowContent += commodityName + ": " + buyPrice + "$ <input type='button' value='Buy' onclick='buyCommodity(" + buyPrice + ",commodities." + commodityName + ")'/> - " + sellPrice + "$<input type='button' value='Sell' onclick='sellCommodity(" + sellPrice + ",commodities." + commodityName + ")'/><br>"
 	}
 
 	islandWindow.setContent(windowContent);
