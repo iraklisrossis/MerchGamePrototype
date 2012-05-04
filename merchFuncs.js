@@ -4,8 +4,12 @@ var latSeed = 4829;
 var lngSeed = 8513;
 
 var sellValue = 0.75;
+var priceChangePerUnit = 0.02;
+var priceChangeRange = avgIslandDist * 5;
 
 var shouldDrawIslands = true;
+
+var currentPosition;
 
 var commodities = {};
 
@@ -44,6 +48,11 @@ commodities.gold = {
 
 var player = {
 	funds: 5000,
+	tradeHist: {
+		wheat: [],
+		apples: [],
+		gold: []
+	},
 	wheat: 0,
 	apples: 0,
 	gold: 0
@@ -201,8 +210,24 @@ function getCommodityValue(latLng, commodity)
     	weightSum += weight;
     	weight *= commodity.atten;
     }
-    var percent = valueSum/weightSum;
-    return commodity.floorPrice + (commodity.ceilingPrice - commodity.floorPrice) * percent;
+    var percentValue = valueSum/weightSum;
+    var normalValue = commodity.floorPrice + (commodity.ceilingPrice - commodity.floorPrice) * percentValue;
+    var inflation = 1;
+    var tradeHist = player.tradeHist[commodity.name];
+	
+	for(var i = 0; i < tradeHist.length; i++)
+	{
+		console.log("TradeHist coord:" + tradeHist[i].coord + " value:" + tradeHist[i].value);
+		var dy = tradeHist[i].coord.lat() - latLng.lat();
+		//var dx = realDistance(tradeHist[i].coord.lng() - latLng.lng(), (tradeHist[i].coord.lat() + latLng.lat())/2);
+		var dx = tradeHist[i].coord.lng() - latLng.lng()
+		var dist = Math.sqrt(dx*dx + dy*dy);
+		var infDist = priceChangeRange - dist;
+		infDist = (infDist > 0)?infDist:0;
+		console.log("" + dy + " " + dx + " " + infDist);
+		inflation += (infDist/priceChangeRange) * tradeHist[i].value * priceChangePerUnit;
+	}
+    return normalValue * inflation;
 }
 
 function getWaveValue(freq, latLng)
@@ -259,7 +284,6 @@ function createIslands(latLng)
 			//var coords = new google.maps.LatLng(cy, cx);
 			var island={marker:new google.maps.Marker({
 											position: coords,
-											title:"Hello World!",
 											icon: "images/island.png",
 											map: map,
 											clickable:true
@@ -280,21 +304,28 @@ function setInfoWindowToIsland(island)
 
 function showInfoWindow(island)
 {
+	currentPosition = island.marker.getPosition();
+	updateIndoWindow();
+  	islandWindow.open(map, island.marker);
+}
+
+function updateIndoWindow()
+{
 	var windowContent = "";
 	for(commodityName in commodities)
 	{
 		var commodity = commodities[commodityName];
-		var buyPrice = Math.floor(getCommodityValue(island.marker.getPosition(), commodity));
+		var buyPrice = Math.floor(getCommodityValue(currentPosition, commodity));
 		var sellPrice = Math.floor(buyPrice * sellValue);
-		windowContent += commodityName + ": " + buyPrice + "$ <input type='button' value='Buy' onclick='buyCommodity(" + buyPrice + ",commodities." + commodityName + ")'/> - " + sellPrice + "$<input type='button' value='Sell' onclick='sellCommodity(" + sellPrice + ",commodities." + commodityName + ")'/><br>"
+		windowContent += commodityName + ": " + buyPrice + "$ <input type='button' value='Buy' onclick='buyCommodity(commodities." + commodityName + ")'/> - " + sellPrice + "$<input type='button' value='Sell' onclick='sellCommodity(commodities." + commodityName + ")'/><br>"
 	}
 
 	islandWindow.setContent(windowContent);
-  	islandWindow.open(map, island.marker);
 }
 
-function buyCommodity(price, commodity)
+function buyCommodity(commodity)
 {
+	var price = Math.floor(getCommodityValue(currentPosition, commodity));
 	if(player.funds < price)
 	{
 		return;
@@ -303,11 +334,37 @@ function buyCommodity(price, commodity)
 	player.funds -= price;
 	player[commodity.name] += 1;
 	
-	updatePlayerPanel()
+	var tradeHist = player.tradeHist[commodity.name];
+	
+	var existed = false;
+	for(var i = 0; i < tradeHist.length; i++)
+	{
+		if(tradeHist[i].coord.equals(currentPosition))
+		{
+			existed = true;
+			tradeHist[i].value += 1;
+			if(tradeHist[i].value == 0)
+			{
+				tradeHist.splice(i,1);
+			}
+			break;
+		}
+	}
+	
+	if(!existed)
+	{
+		tradeHist.push({
+						coord: currentPosition,
+						value: 1
+						});
+	}
+	updateIndoWindow();
+	updatePlayerPanel();
 }
 
-function sellCommodity(price, commodity)
+function sellCommodity(commodity)
 {
+	var price = Math.floor(getCommodityValue(currentPosition, commodity) * sellValue);
 	if(player[commodity.name] < 1)
 	{
 		return;
@@ -316,6 +373,29 @@ function sellCommodity(price, commodity)
 	player.funds += price;
 	player[commodity.name] -= 1;
 	
+	var tradeHist = player.tradeHist[commodity.name];
+	var existed = false;
+	for(var i = 0; i < tradeHist.length; i++)
+	{
+		if(tradeHist[i].coord.equals(currentPosition))
+		{
+			existed = true;
+			tradeHist[i].value -= 1;
+			if(tradeHist[i].value == 0)
+			{
+				tradeHist.splice(i,1);
+			}
+			break;
+		}
+	}
+	if(!existed)
+	{
+		tradeHist.push({
+						coord: currentPosition,
+						value: -1
+						});
+	}
+	updateIndoWindow();
 	updatePlayerPanel();
 }
 
