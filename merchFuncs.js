@@ -3,6 +3,8 @@ var renderDist = 0.009000;
 var latSeed = 4829;
 var lngSeed = 8513;
 
+var time = 0;
+
 var sellValue = 0.75;
 var priceChangePerUnit = 0.02;
 var priceChangeRange = avgIslandDist * 5;
@@ -305,11 +307,11 @@ function setInfoWindowToIsland(island)
 function showInfoWindow(island)
 {
 	currentPosition = island.marker.getPosition();
-	updateIndoWindow();
+	updateInfoWindow();
   	islandWindow.open(map, island.marker);
 }
 
-function updateIndoWindow()
+function updateInfoWindow()
 {
 	var windowContent = "";
 	for(commodityName in commodities)
@@ -358,7 +360,7 @@ function buyCommodity(commodity)
 						value: 1
 						});
 	}
-	updateIndoWindow();
+	updateInfoWindow();
 	updatePlayerPanel();
 }
 
@@ -395,7 +397,7 @@ function sellCommodity(commodity)
 						value: -1
 						});
 	}
-	updateIndoWindow();
+	updateInfoWindow();
 	updatePlayerPanel();
 }
 
@@ -437,4 +439,39 @@ function realDistance(dist,lat)
 	var newDist = dist / Math.cos(Math.PI * lat / 180);
 	//console.log("latitude:" + latLng.lat() + " dist:" + dist + " newDist:" + newDist);
 	return newDist
+}
+
+function AdvanceTime()
+{
+	time += 1;
+	
+	for(commodityName in player.tradeHist)
+	{
+		var commodity = player.tradeHist[commodityName];
+		for(var i = 0; i < commodity.length; i++)
+		{
+			if(commodity[i].value < 0)
+			{
+				commodity[i].value += 1;
+				if(commodity[i].value > 0)
+				{
+					commodity[i].value = 0;
+				}
+			}
+			else
+			{
+				commodity[i].value -= 1;
+				if(commodity[i].value < 0)
+				{
+					commodity[i].value = 0;
+				}
+			}
+			
+			if(commodity[i].value == 0)
+			{
+				commodity.splice(i,1);
+			}
+		}
+	}
+	updateInfoWindow();
 }
