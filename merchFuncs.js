@@ -51,13 +51,8 @@ commodities.gold = {
 var player = {
 	funds: 5000,
 	tradeHist: {
-		wheat: [],
-		apples: [],
-		gold: []
-	},
-	wheat: 0,
-	apples: 0,
-	gold: 0
+		
+	}
 }
 
 var map;
@@ -85,6 +80,31 @@ function initialize() {
   	islandWindow = new google.maps.InfoWindow({
   												
   												});
+  	var commoditiesDivHTML = "";
+  	var playerHoldDivHTML = "";
+  	for(commodityName in commodities)
+  	{
+  		var commodity = commodities[commodityName];
+  		
+  		commoditiesDivHTML += "<div id='" + commodityName + "Controls' style='float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;'>" +
+								commodityName + "<br>" +
+								"<br>" + 
+								"Render <input id='render" + commodityName + "Checkbox' type='checkbox' onclick='commodities." + commodityName + ".draw=this.checked;createCommodities(center, commodities." + commodityName + ");'/><br>" +
+								"Color:<input type='text' id='" + commodityName + "ColorBox' style='width:100px;' onchange='commodities." + commodityName + ".color = this.value'/><br>" +
+								"Floor :<input type='text' id='" + commodityName + "FloorPBox' style='width:100px;' onchange='commodities." + commodityName + ".floorPrice = this.value'/><br>" +
+								"Ceilin:<input type='text' id='" + commodityName + "CeilPBox' style='width:100px;' onchange='commodities." + commodityName + ".ceilingPrice = this.value'/><br>" +
+								"Freq1:<input type='text' id='" + commodityName + "Freq1Box' style='width:100px;' onchange='commodities." + commodityName + ".freqs[0] = this.value'/><br>" +
+								"Freq2:<input type='text' id='" + commodityName + "Freq2Box' style='width:100px;' onchange='commodities." + commodityName + ".freqs[1] = this.value'/><br>" +
+								"Freq3:<input type='text' id='" + commodityName + "Freq3Box' style='width:100px;' onchange='commodities." + commodityName + ".freqs[2] = this.value'/><br>" +
+								"Attenuation:<input type='text' id='" + commodityName + "AttenBox' style='width:100px;' onchange='commodities." + commodityName + ".atten = this.value'/><br>" +
+							"</div>";
+							
+		playerHoldDivHTML += commodityName + ": <label type='text' id='player" + commodityName + "Label' style='width:100px;'/></label><br>"
+		player.tradeHist[commodityName] = [];
+		player[commodityName] = 0;
+  	}
+  	e('ControlsRow2').innerHTML = commoditiesDivHTML;
+  	e('playerHold').innerHTML = playerHoldDivHTML;
   	updateInterface();
 	redraw();
 }
@@ -101,49 +121,35 @@ function updateInterface()
 	e("lngSeedBox").value = lngSeed;
 	
 	updatePlayerPanel();
-
-	e("renderWheatCheckbox").checked = commodities.wheat.draw;
-	e("wheatColorBox").value = commodities.wheat.color;
-	e("wheatFloorPBox").value = commodities.wheat.floorPrice;
-	e("wheatCeilPBox").value = commodities.wheat.ceilingPrice;
-	e("wheatFreq1Box").value = commodities.wheat.freqs[0];
-	e("wheatFreq2Box").value = commodities.wheat.freqs[1];
-	e("wheatFreq3Box").value = commodities.wheat.freqs[2];
-	e("wheatAttenBox").value = commodities.wheat.atten;
-	
-	e("renderApplesCheckbox").checked = commodities.apples.draw;
-	e("applesColorBox").value = commodities.apples.color;
-	e("applesFloorPBox").value = commodities.apples.floorPrice;
-	e("applesCeilPBox").value = commodities.apples.ceilingPrice;
-	e("applesFreq1Box").value = commodities.apples.freqs[0];
-	e("applesFreq2Box").value = commodities.apples.freqs[1];
-	e("applesFreq3Box").value = commodities.apples.freqs[2];
-	e("applesAttenBox").value = commodities.apples.atten;
-	
-	e("renderGoldCheckbox").checked = commodities.gold.draw;
-	e("goldColorBox").value = commodities.gold.color;
-	e("goldFloorPBox").value = commodities.gold.floorPrice;
-	e("goldCeilPBox").value = commodities.gold.ceilingPrice;
-	e("goldFreq1Box").value = commodities.gold.freqs[0];
-	e("goldFreq2Box").value = commodities.gold.freqs[1];
-	e("goldFreq3Box").value = commodities.gold.freqs[2];
-	e("goldAttenBox").value = commodities.gold.atten;
+	for(commodityName in commodities)
+  	{
+		e("render" + commodityName + "Checkbox").checked = commodities[commodityName].draw;
+		e(commodityName + "ColorBox").value = commodities[commodityName].color;
+		e(commodityName + "FloorPBox").value = commodities[commodityName].floorPrice;
+		e(commodityName + "CeilPBox").value = commodities[commodityName].ceilingPrice;
+		e(commodityName + "Freq1Box").value = commodities[commodityName].freqs[0];
+		e(commodityName + "Freq2Box").value = commodities[commodityName].freqs[1];
+		e(commodityName + "Freq3Box").value = commodities[commodityName].freqs[2];
+		e(commodityName + "AttenBox").value = commodities[commodityName].atten;
+	}
 }
 
 function updatePlayerPanel()
 {
 	e("playerFundsLabel").innerHTML = player.funds;
-	e("playerWheatLabel").innerHTML = player.wheat;
-	e("playerApplesLabel").innerHTML = player.apples;
-	e("playerGoldLabel").innerHTML = player.gold;
+	for(commodityName in commodities)
+  	{
+		e("player" + commodityName + "Label").innerHTML = player[commodityName];
+	}
 }
 
 function redraw()
 {
 	createIslands(center);
-	createCommodities(center, commodities.wheat);
-	createCommodities(center, commodities.apples);
-	createCommodities(center, commodities.gold);
+	for(commodityName in commodities)
+  	{
+		createCommodities(center, commodities[commodityName]);
+	}
 }
 
 function updateRenderingValues()
