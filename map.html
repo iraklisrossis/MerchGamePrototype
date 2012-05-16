@@ -16,7 +16,7 @@
 	<body onload="initialize()">
 		<div id="map_canvas" style="float:left; width:800px; height:800px"></div>
 		<div id="Controls" style="float:left; width:1000px; height:800px;">
-			<div id="ControlsRow1" style="float:top; width:100%; height:30%;">
+			<div id="ControlsRow1" style="float:top; width:100%; height:40%;">
 				<div id="RenderControls" style="float:left; width:150px; height:90%; padding: 5px; border: 5px white groove;">
 					Rendering controls<br>
 					<br>
@@ -41,6 +41,7 @@
 					$$$$$: <label type="text" id="playerFundsLabel" style="width:100px;"/></label><br>
 					<br>
 					Cargo Hold<br>
+					total cargo:<label id='playerTotalCargo'></label>/<label id='playerMaxCargo'></label>
 					<div id='playerHold'></div><br>
 					<input type="button" value="Advance time" onclick="AdvanceTime()"/><br>
 				</div>

@@ -1,11 +1,11 @@
 var avgIslandDist = 0.000500;
-var renderDist = 0.009000;
+var renderDist = 0.010000;
 var latSeed = 4829;
 var lngSeed = 8513;
 
 var time = 0;
 
-var sellValue = 0.75;
+var sellValue = 0.85;
 var priceChangePerUnit = 0.02;
 var priceChangeRange = avgIslandDist * 5;
 
@@ -22,7 +22,29 @@ commodities.wheat = {
 	atten: 0.5,
 	draw: false,
 	floorPrice: 10,
-	ceilingPrice: 100,
+	ceilingPrice: 50,
+	icons: []
+}
+
+commodities.corn = {
+	name: "corn",
+	freqs: [0.0065, 0.0165, 0.028],
+	color: "00FF00",
+	atten: 0.5,
+	draw: false,
+	floorPrice: 12,
+	ceilingPrice: 60,
+	icons: []
+}
+
+commodities.grapes = {
+	name: "grapes",
+	freqs: [0.0063, 0.0175, 0.029],
+	color: "00FF00",
+	atten: 0.5,
+	draw: false,
+	floorPrice: 10,
+	ceilingPrice: 50,
 	icons: []
 }
 
@@ -37,19 +59,20 @@ commodities.apples = {
 	icons: []
 }
 
-commodities.gold = {
-	name: "gold",
+commodities.silver = {
+	name: "silver",
 	freqs: [0.002, 0.011, 0.019],
 	color: "FFFF00",
 	atten: 0.2,
 	draw: false,
 	floorPrice: 100,
-	ceilingPrice: 600,
+	ceilingPrice: 400,
 	icons: []
 }
 
 var player = {
-	funds: 5000,
+	funds: 500,
+	maxCargo: 100,
 	tradeHist: {
 		
 	}
@@ -105,6 +128,7 @@ function initialize() {
   	}
   	e('ControlsRow2').innerHTML = commoditiesDivHTML;
   	e('playerHold').innerHTML = playerHoldDivHTML;
+  	e('playerMaxCargo').innerHTML = player.maxCargo;
   	updateInterface();
 	redraw();
 }
@@ -137,6 +161,7 @@ function updateInterface()
 function updatePlayerPanel()
 {
 	e("playerFundsLabel").innerHTML = player.funds;
+	e("playerTotalCargo").innerHTML = totalCargo();
 	for(commodityName in commodities)
   	{
 		e("player" + commodityName + "Label").innerHTML = player[commodityName];
@@ -334,7 +359,7 @@ function updateInfoWindow()
 function buyCommodity(commodity)
 {
 	var price = Math.floor(getCommodityValue(currentPosition, commodity));
-	if(player.funds < price)
+	if(player.funds < price || totalCargo() >= player.maxCargo)
 	{
 		return;
 	}
@@ -405,6 +430,16 @@ function sellCommodity(commodity)
 	}
 	updateInfoWindow();
 	updatePlayerPanel();
+}
+
+function totalCargo()
+{
+	var total = 0;
+	for(commodityName in commodities)
+	{
+		total += player[commodityName];
+	}
+	return total;
 }
 
 function randomizeIslandPosition(lat, lng, yQuantum, xQuantum, yAvgDist, xAvgDist)
