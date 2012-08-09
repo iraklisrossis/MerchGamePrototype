@@ -20,19 +20,10 @@ class Renderer
 public:
 	Renderer();
 
-	void init();
-
-	void draw(GLfloat z, GLfloat rotation);
+	void initialize();
 
 	int loadImage(MAHandle imageHandle);
 
-	void gluPerspective(
-		GLfloat fovy,
-		GLfloat aspect,
-		GLfloat zNear,
-		GLfloat zFar);
-
-	void setViewport(int width, int height);
 
 private:
 	StackScreen *mStackScreen;

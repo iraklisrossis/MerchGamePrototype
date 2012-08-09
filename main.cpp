@@ -5,6 +5,7 @@
 #include <MAUtil/GLMoblet.h>
 #include <GLES/gl.h>
 #include "Renderer.h"
+#include "Interpreter.h"
 
 using namespace MAUtil;
 
@@ -24,7 +25,8 @@ public:
 	 */
 	Archipelago()
 	{
-		mRenderer.init();
+		mRenderer.initialize();
+		mInterpreter.initialize(&mRenderer);
 	}
 
 	// ================== Event methods ==================
@@ -54,6 +56,8 @@ private:
 
 	// ================== Instance variables ==================
 	Renderer mRenderer;
+
+	Interpreter mInterpreter;
 };
 
 /**
