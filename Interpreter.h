@@ -10,6 +10,8 @@
 
 #include "Renderer.h"
 
+class lua_State;
+
 class Interpreter
 {
 public:
@@ -17,10 +19,14 @@ public:
 
 	void initialize(Renderer *renderer);
 
-	void loadScript();
+	void loadScript(const char *script);
+
+	void newCoord(double lat, double lng);
 
 private:
 	Renderer *mRenderer;
+
+	lua_State *L;
 };
 
 

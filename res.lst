@@ -1,2 +1,6 @@
 .res IMAGE_ISLAND
 .image "images/island.png"
+
+.res LUA_SCRIPT
+.bin
+.include "script.lua"

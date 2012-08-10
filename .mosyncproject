@@ -8,15 +8,21 @@
 </filter>
 </criteria>
 <properties>
+<property key="build.prefs:additional.include.paths/Debug" value="./, ./lua/inc/, ./lua/src/"/>
 <property key="build.prefs:additional.include.paths/Release" value="./, ./lua/inc/, ./lua/src/"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, mafsD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, mafs.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibration"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.switches/Debug" value="-O0 -DPLATFORM_%platform-family% -DVARIANT_%platform-variant% -DMOSYNC"/>
 <property key="build.prefs:gcc.switches/Release" value="-O2 -DPLATFORM_%platform-family% -DVARIANT_%platform-variant% -DMOSYNC -DTOLUA_RELEASE"/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:memory.data/Debug" value="4096"/>
 <property key="build.prefs:memory.data/Release" value="4096"/>
@@ -26,6 +32,7 @@
 <property key="build.prefs:memory.stack/Release" value="512"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.opengles"/>
