@@ -19,12 +19,15 @@ public:
 
 	void initialize(Renderer *renderer);
 
+	void setMapSize(int width, int height);
+
 	void loadScript(const char *script);
 
 	void newCoord(double lat, double lng);
 
-private:
 	Renderer *mRenderer;
+private:
+
 
 	lua_State *L;
 };

@@ -33,7 +33,7 @@ void Renderer::initialize()
 		mIslandButtons[i]->wrapContentHorizontally();
 		mIslandButtons[i]->wrapContentVertically();
 		mapLayout->addChild(mIslandButtons[i]);
-		mIslandButtons[i]->setPosition(i*20,0);
+		mIslandButtons[i]->setVisible(false);
 	}
 
 	mMapScreen->addChild(mapLayout);
@@ -45,4 +45,31 @@ void Renderer::initialize()
 int Renderer::loadImage(MAHandle imageHandle)
 {
 
+}
+
+void Renderer::getMapSize(int *width, int *height)
+{
+	*width = mMapScreen->getWidth();
+	*height = mMapScreen->getHeight();
+}
+
+void Renderer::clearIslands()
+{
+	for(int i = 0; i < MAX_ISLANDS; i++)
+	{
+		mIslandButtons[i]->setVisible(false);
+	}
+}
+
+void Renderer::addIsland(int x, int y)
+{
+	for(int i = 0; i < MAX_ISLANDS; i++)
+	{
+		if(!mIslandButtons[i]->isVisible())
+		{
+			mIslandButtons[i]->setPosition(x,y);
+			mIslandButtons[i]->setVisible(true);
+			break;
+		}
+	}
 }

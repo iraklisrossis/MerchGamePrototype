@@ -14,7 +14,7 @@ using namespace MAUtil;
  * The template program draws a rotating quad. Touch the
  * screen to change the depth coordinate.
  */
-class Archipelago : public Moblet
+class Archipelago : public Moblet, public TimerListener
 {
 public:
 
@@ -34,9 +34,8 @@ public:
 
 		mInterpreter.loadScript(mLuaScript);
 
-		maLocationStart();
-
 		Environment::getEnvironment().addCustomEventListener(this);
+		Environment::getEnvironment().addTimer(this,200,1);
 	}
 
 	// ================== Event methods ==================
@@ -72,6 +71,15 @@ public:
 				mInterpreter.newCoord(loc->lat, loc->lon);
 			}
 		}
+	}
+
+	void runTimerEvent()
+	{
+		//Start the game here. We need to wait a bit for the interface to initialize
+		int width,height;
+		mRenderer.getMapSize(&width, &height);
+		mInterpreter.setMapSize(width,height);
+		maLocationStart();
 	}
 
 private:

@@ -34,6 +34,9 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
+<property key="iphone:cert" value="iPhone Distribution"/>
+<property key="iphone:certproj.spec" value="true"/>
+<property key="iphone:provisioning.file" value="/Users/iraklis/Documents/certificates/MoSync_AB_Distribution.mobileprovision"/>
 <property key="profile.mgr.type" value="0"/>
 <property key="template.id" value="project.opengles"/>
 </properties>

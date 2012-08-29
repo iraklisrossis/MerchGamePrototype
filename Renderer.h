@@ -24,6 +24,12 @@ public:
 
 	int loadImage(MAHandle imageHandle);
 
+	void getMapSize(int *width, int *height);
+
+	void clearIslands();
+
+	void addIsland(int x, int y);
+
 
 private:
 	StackScreen *mStackScreen;
